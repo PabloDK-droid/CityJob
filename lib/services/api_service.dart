@@ -1,23 +1,22 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../models/environment_config.dart';
 
 class ApiService {
-  // IP para emulador de Android: 10.0.2.2
-  // navegador: localhost
-static const String baseUrl = "http://localhost:3000";
+  static final String baseUrl = EnvironmentConfig.apiUrl;
 
-  Future<void> testDatabaseConnection() async {
+  static Future<String> testConnection() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/test-db'));
+    final response = await http.get(Uri.parse('$baseUrl/'));
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        print("¡Conexión Exitosa con PSQL!: ${data['time']}");
+        final data = json.decode(response.body);
+        return data['message'] ?? 'Conexión exitosa';
       } else {
-        print("Error del servidor: ${response.statusCode}");
+        return 'Error del servidor: ${response.statusCode}';
       }
     } catch (e) {
-      print("No se pudo conectar al servidor: $e");
+      throw Exception('No se pudo conectar con la API: $e');
     }
   }
 }
