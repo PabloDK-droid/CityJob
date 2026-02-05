@@ -1,21 +1,26 @@
 const express = require('express');
-const cors = require('cors'); // <--- 1. Importar
 const app = express();
-const pool = require('./db');
+const pool = require('./db'); // Tu archivo de conexión a PSQL
+const cors = require('cors'); // 1. Importa cors
 
-app.use(cors()); // <--- 2. Habilitar para todas las peticiones
-app.use(express.json());
+// En tu archivo del servidor (ej. index.js)
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 
-// Tu ruta de prueba
-app.get('/test-db', async (req, res) => {
+// Esta es la ruta que mencionas, está bien que sea '/'
+app.get('/', async (req, res) => {
   try {
-    const result = await pool.query('SELECT NOW()');
-    res.json({ message: "Conexión exitosa", time: result.rows[0] });
+    const result = await pool.query('SELECT NOW()'); // Prueba simple a la DB
+    res.json({ message: 'Conexión exitosa con CityJob', time: result.rows[0] });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.listen(3000, () => {
-  console.log("Servidor corriendo en el puerto 3000");
+// ESTO ES LO QUE FALTA: Si no hay un listen, el proceso termina de inmediato
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor de CityJob corriendo en http://localhost:${PORT}`);
 });
